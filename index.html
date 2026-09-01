@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUCKYVERSE - Virtual Gaming Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-neon">
+    <!-- Global Demo Notice -->
+    <div id="demo-notice">
+        🎮 DEMO MODE — Virtual Coins Only — No Real Money
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="app.navigate('home')">
+                <span class="logo-icon">✨</span> LUCKYVERSE
+            </div>
+            <ul class="nav-links">
+                <li onclick="app.navigate('home')">Home</li>
+                <li onclick="app.navigate('lobby')">Games</li>
+                <li onclick="app.navigate('rewards')">Rewards</li>
+                <li onclick="app.navigate('leaderboard')">Leaderboard</li>
+                <li onclick="app.navigate('history')">History</li>
+                <li onclick="app.navigate('achievements')">Achievements</li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="wallet-badge" onclick="app.navigate('wallet')">
+                🪙 <span id="nav-balance">10000</span>
+            </div>
+            <div class="nav-icon" onclick="app.showNotification('No new notifications', 'info')">🔔</div>
+            <div class="profile-dropdown">
+                <div class="avatar" id="nav-avatar">👤</div>
+                <div class="dropdown-content">
+                    <a onclick="app.navigate('profile')">My Profile</a>
+                    <a onclick="app.navigate('statistics')">Statistics</a>
+                    <a onclick="app.navigate('wallet')">Wallet</a>
+                    <a onclick="app.confirmAction('Reset Demo Account', 'Are you sure you want to reset your demo account? All progress will be lost.', () => app.resetAccount())">Reset Demo Account</a>
+                </div>
+            </div>
+            <div class="hamburger" onclick="app.toggleMobileMenu()">☰</div>
+        </div>
+    </nav>
+    <div id="mobile-menu" class="hidden">
+        <a onclick="app.navigate('home')">Home</a>
+        <a onclick="app.navigate('lobby')">Games</a>
+        <a onclick="app.navigate('wallet')">Wallet</a>
+        <a onclick="app.navigate('rewards')">Rewards</a>
+        <a onclick="app.navigate('leaderboard')">Leaderboard</a>
+        <a onclick="app.navigate('history')">History</a>
+        <a onclick="app.navigate('achievements')">Achievements</a>
+        <a onclick="app.navigate('profile')">Profile</a>
+        <a onclick="app.navigate('statistics')">Statistics</a>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- HOME SECTION -->
+        <section id="view-home" class="view active">
+            <div class="hero">
+                <h1>PLAY. WIN. HAVE FUN.</h1>
+                <p>Experience exciting games with virtual coins.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="app.navigate('lobby')">Explore Games</button>
+                    <button class="btn-secondary" onclick="app.navigate('rewards')">Daily Rewards</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Balance</h3><p id="home-stat-balance">🪙 10,000</p></div>
+                <div class="stat-card"><h3>Games Played</h3><p id="home-stat-games">0</p></div>
+                <div class="stat-card"><h3>Total Wins</h3><p id="home-stat-wins">0</p></div>
+                <div class="stat-card"><h3>Win Rate</h3><p id="home-stat-winrate">0%</p></div>
+            </div>
+        </section>
+
+        <!-- LOBBY SECTION -->
+        <section id="view-lobby" class="view hidden">
+            <div class="lobby-header">
+                <h2>Game Lobby</h2>
+                <input type="text" id="game-search" placeholder="Search games..." onkeyup="app.filterGames()">
+            </div>
+            <div class="games-grid" id="games-container">
+                <!-- Games injected by JS -->
+            </div>
+            <h2 class="mt-4">❤️ My Favorites</h2>
+            <div class="games-grid" id="favorites-container">
+                <!-- Favorites injected by JS -->
+            </div>
+        </section>
+
+        <!-- WALLET SECTION -->
+        <section id="view-wallet" class="view hidden">
+            <h2>Virtual Wallet</h2>
+            <div class="wallet-dashboard">
+                <div class="wallet-card primary">
+                    <h3>Current Balance</h3>
+                    <div class="huge-amount">🪙 <span id="wallet-balance">10000</span></div>
+                </div>
+                <div class="wallet-stats">
+                    <div class="w-stat"><span>Total Won</span><span class="text-green" id="wallet-won">🟢 +0</span></div>
+                    <div class="w-stat"><span>Total Lost</span><span class="text-red" id="wallet-lost">🔴 -0</span></div>
+                    <div class="w-stat"><span>Biggest Win</span><span class="text-gold" id="wallet-best-win">🏆 +0</span></div>
+                    <div class="w-stat"><span>Biggest Loss</span><span class="text-red" id="wallet-worst-loss">💔 -0</span></div>
+                </div>
+            </div>
+            <div class="wallet-actions">
+                <button class="btn-glow" id="btn-claim-bonus" onclick="wallet.claimBonus()">🎁 Claim Demo Bonus</button>
+                <p id="bonus-timer" class="timer-text"></p>
+            </div>
+        </section>
+
+        <!-- REWARDS SECTION -->
+        <section id="view-rewards" class="view hidden">
+            <h2>Daily Rewards</h2>
+            <p>Come back every day to claim increasing amounts of virtual coins!</p>
+            <div class="rewards-calendar" id="rewards-calendar">
+                <!-- Injected by JS -->
+            </div>
+            <div class="reward-action mt-4 text-center">
+                <h3 id="reward-status">Next reward available in: --:--:--</h3>
+                <button class="btn-primary" id="btn-claim-daily" onclick="rewards.claimDaily()">Claim Reward</button>
+            </div>
+        </section>
+
+        <!-- ACHIEVEMENTS SECTION -->
+        <section id="view-achievements" class="view hidden">
+            <h2>Achievements</h2>
+            <div class="achievements-grid" id="achievements-container">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <!-- LEADERBOARD SECTION -->
+        <section id="view-leaderboard" class="view hidden">
+            <h2>Leaderboard</h2>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Virtual Coins</th>
+                            <th>Games</th>
+                            <th>Wins</th>
+                            <th>Win Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- HISTORY SECTION -->
+        <section id="view-history" class="view hidden">
+            <h2>Game History</h2>
+            <div class="history-controls">
+                <select id="history-filter" onchange="historyView.render()">
+                    <option value="all">All Games</option>
+                    <option value="win">Wins</option>
+                    <option value="loss">Losses</option>
+                    <option value="Slot Machine">Slots</option>
+                    <option value="Dice Rush">Dice</option>
+                    <option value="Coin Flip">Coin Flip</option>
+                    <option value="Roulette">Roulette</option>
+                    <option value="Blackjack">Blackjack</option>
+                </select>
+                <button class="btn-secondary" onclick="app.confirmAction('Clear History', 'Delete all game history?', () => historyView.clear())">Clear History</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Game</th>
+                            <th>Bet</th>
+                            <th>Result</th>
+                            <th>Profit/Loss</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PROFILE SECTION -->
+        <section id="view-profile" class="view hidden">
+            <h2>My Profile</h2>
+            <div class="profile-layout">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar-large" id="profile-avatar">👤</div>
+                        <h3 id="profile-username">Player</h3>
+                        <p>Joined: <span id="profile-join-date">-</span></p>
+                    </div>
+                    <div class="profile-edit">
+                        <input type="text" id="edit-username" placeholder="New Username">
+                        <input type="text" id="edit-avatar" placeholder="New Avatar (Emoji)">
+                        <button class="btn-primary" onclick="profile.save()">Save Profile</button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h3>Settings</h3>
+                    <div class="setting-item">
+                        <span>Theme</span>
+                        <select id="setting-theme" onchange="app.changeTheme(this.value)">
+                            <option value="neon">Neon</option>
+                            <option value="cyber">Cyber</option>
+                            <option value="galaxy">Galaxy</option>
+                            <option value="emerald">Emerald</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span>Sound Effects</span>
+                        <label class="switch"><input type="checkbox" id="setting-sound" onchange="app.toggleSound(this.checked)"><span class="slider"></span></label>
+                    </div>
+                    <div class="setting-item">
+                        <span>Animations</span>
+                        <label class="switch"><input type="checkbox" id="setting-anim" onchange="app.toggleAnimations(this.checked)"><span class="slider"></span></label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATISTICS SECTION -->
+        <section id="view-statistics" class="view hidden">
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Total Games</h3><p id="stat-total-games">0</p></div>
+                <div class="stat-card"><h3>Total Wins</h3><p id="stat-total-wins">0</p></div>
+                <div class="stat-card"><h3>Total Losses</h3><p id="stat-total-losses">0</p></div>
+                <div class="stat-card"><h3>Win Percentage</h3><p id="stat-win-pct">0%</p></div>
+                <div class="stat-card"><h3>Total Won</h3><p class="text-green" id="stat-won">0</p></div>
+                <div class="stat-card"><h3>Total Lost</h3><p class="text-red" id="stat-lost">0</p></div>
+                <div class="stat-card"><h3>Current Streak</h3><p id="stat-streak">0</p></div>
+                <div class="stat-card"><h3>Best Streak</h3><p id="stat-best-streak">0</p></div>
+                <div class="stat-card"><h3>Favorite Game</h3><p id="stat-fav-game">-</p></div>
+            </div>
+            <!-- Simple CSS based bar chart -->
+            <div class="chart-container mt-4">
+                <h3>Win/Loss Ratio</h3>
+                <div class="bar-chart">
+                    <div class="bar bar-win" id="chart-win" style="width: 50%;">Wins: 50%</div>
+                    <div class="bar bar-loss" id="chart-loss" style="width: 50%;">Losses: 50%</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== GAMES VIEWS =================== -->
+
+        <!-- Slot Machine -->
+        <section id="game-slot" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Slot Machine')">Rules</button>
+            <h2>🎰 Slot Machine</h2>
+            <div class="game-container">
+                <div class="slot-machine">
+                    <div class="slot-reels">
+                        <div class="reel" id="reel1">🍒</div>
+                        <div class="reel" id="reel2">🍒</div>
+                        <div class="reel" id="reel3">🍒</div>
+                    </div>
+                    <div class="game-controls">
+                        <input type="number" id="slot-bet" placeholder="Bet Amount" value="100" min="1">
+                        <button class="btn-play" onclick="games.slot.spin()" id="btn-spin-slot">SPIN</button>
+                    </div>
+                    <div class="game-result" id="slot-result">Ready to spin!</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dice Rush -->
+        <section id="game-dice" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Dice Rush')">Rules</button>
+            <h2>🎲 Dice Rush</h2>
+            <div class="game-container">
+                <div class="dice-display">
+                    <div class="dice-number" id="dice-result">--</div>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="dice-bet" placeholder="Bet Amount" value="100" min="1">
+                    <div class="dice-options">
+                        <button class="btn-secondary" onclick="games.dice.roll('under')">Under 50 (2x)</button>
+                        <button class="btn-secondary" onclick="games.dice.roll('over')">Over 50 (2x)</button>
+                        <button class="btn-secondary" onclick="games.dice.roll('exact')">Exact 50 (50x)</button>
+                    </div>
+                </div>
+                <div class="game-result" id="dice-msg">Place your bet!</div>
+            </div>
+        </section>
+
+        <!-- Coin Flip -->
+        <section id="game-coin" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Coin Flip')">Rules</button>
+            <h2>🪙 Coin Flip</h2>
+            <div class="game-container">
+                <div class="coin-container">
+                    <div class="coin" id="coin-visual">
+                        <div class="coin-face front">H</div>
+                        <div class="coin-face back">T</div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="coin-bet" placeholder="Bet Amount" value="100" min="1">
+                    <div class="flex-row">
+                        <button class="btn-secondary w-50" onclick="games.coin.flip('heads')">Heads</button>
+                        <button class="btn-secondary w-50" onclick="games.coin.flip('tails')">Tails</button>
+                    </div>
+                </div>
+                <div class="game-result" id="coin-msg">Choose Heads or Tails</div>
+            </div>
+        </section>
+
+        <!-- Roulette -->
+        <section id="game-roulette" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Roulette')">Rules</button>
+            <h2>🎡 Roulette</h2>
+            <div class="game-container">
+                <div class="roulette-wheel" id="roulette-wheel-visual">
+                    <div class="roulette-number" id="roulette-result-number">?</div>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="roulette-bet" placeholder="Bet Amount" value="100" min="1">
+                    <div class="roulette-bets">
+                        <select id="roulette-bet-type">
+                            <option value="red">Red (2x)</option>
+                            <option value="black">Black (2x)</option>
+                            <option value="even">Even (2x)</option>
+                            <option value="odd">Odd (2x)</option>
+                            <option value="low">Low 1-18 (2x)</option>
+                            <option value="high">High 19-36 (2x)</option>
+                        </select>
+                        <input type="number" id="roulette-exact" placeholder="Exact # (0-36)" min="0" max="36" class="hidden">
+                    </div>
+                    <button class="btn-play mt-2" onclick="games.roulette.spin()">SPIN WHEEL</button>
+                </div>
+                <div class="game-result" id="roulette-msg">Place your bets!</div>
+            </div>
+        </section>
+
+        <!-- Blackjack -->
+        <section id="game-blackjack" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Blackjack')">Rules</button>
+            <h2>🃏 Blackjack</h2>
+            <div class="game-container bj-container">
+                <div class="bj-dealer">
+                    <h3>Dealer: <span id="bj-dealer-score">?</span></h3>
+                    <div class="cards" id="bj-dealer-cards"></div>
+                </div>
+                <div class="game-result" id="bj-msg">Place bet to start!</div>
+                <div class="bj-player">
+                    <h3>Player: <span id="bj-player-score">0</span></h3>
+                    <div class="cards" id="bj-player-cards"></div>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="bj-bet" placeholder="Bet Amount" value="100" min="1">
+                    <button class="btn-play" id="bj-btn-deal" onclick="games.blackjack.deal()">DEAL</button>
+                    <div class="bj-actions hidden" id="bj-actions">
+                        <button class="btn-secondary" onclick="games.blackjack.hit()">Hit</button>
+                        <button class="btn-secondary" onclick="games.blackjack.stand()">Stand</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lucky Number -->
+        <section id="game-lucky" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Lucky Number')">Rules</button>
+            <h2>🎯 Lucky Number</h2>
+            <div class="game-container">
+                <div class="lucky-difficulty mb-3">
+                    <button class="btn-secondary active" onclick="games.lucky.setDifficulty('easy')">Easy (1-20)</button>
+                    <button class="btn-secondary" onclick="games.lucky.setDifficulty('medium')">Med (1-50)</button>
+                    <button class="btn-secondary" onclick="games.lucky.setDifficulty('hard')">Hard (1-100)</button>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="lucky-bet" placeholder="Bet Amount" value="100" min="1">
+                    <button class="btn-play mt-2 mb-2" id="lucky-btn-start" onclick="games.lucky.start()">START GAME</button>
+                    
+                    <div id="lucky-play-area" class="hidden">
+                        <input type="number" id="lucky-guess" placeholder="Your Guess">
+                        <button class="btn-primary" onclick="games.lucky.guess()">GUESS</button>
+                        <p class="mt-2">Attempts left: <span id="lucky-attempts">5</span></p>
+                    </div>
+                </div>
+                <div class="game-result" id="lucky-msg">Select difficulty and start.</div>
+            </div>
+        </section>
+
+        <!-- Gem Match -->
+        <section id="game-gem" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Gem Match')">Rules</button>
+            <h2>💎 Gem Match</h2>
+            <div class="game-container">
+                <p>Bet virtual coins and try to find 3 matching gems hidden in the grid!</p>
+                <div class="game-controls mb-3">
+                    <input type="number" id="gem-bet" placeholder="Bet Amount" value="100" min="1">
+                    <button class="btn-play" onclick="games.gem.start()" id="gem-btn-start">START ROUND</button>
+                </div>
+                <div class="gem-grid" id="gem-grid">
+                    <!-- Grid injected by JS -->
+                </div>
+                <div class="game-result mt-3" id="gem-msg">Ready to play.</div>
+            </div>
+        </section>
+
+        <!-- Crash Demo -->
+        <section id="game-crash" class="view hidden game-view">
+            <button class="btn-back" onclick="app.navigate('lobby')">← Back to Lobby</button>
+            <button class="btn-rules" onclick="app.showRules('Crash Demo')">Rules</button>
+            <h2>🧱 Crash Demo</h2>
+            <div class="game-container">
+                <div class="crash-display" id="crash-visual">
+                    <div class="crash-multiplier" id="crash-multiplier">1.00x</div>
+                </div>
+                <div class="game-controls">
+                    <input type="number" id="crash-bet" placeholder="Bet Amount" value="100" min="1">
+                    <button class="btn-play mt-2" onclick="games.crash.start()" id="crash-btn-start">START (PLACE BET)</button>
+                    <button class="btn-secondary mt-2 hidden" onclick="games.crash.collect()" id="crash-btn-collect">COLLECT</button>
+                </div>
+                <div class="game-result" id="crash-msg">Place bet to start.</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="hidden">
+        <!-- Rules Modal -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3 id="rules-title">Game Rules</h3>
+                <button class="close-btn" onclick="app.closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="rules-content">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div id="confirm-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirm Action</h3>
+                <button class="close-btn" onclick="app.closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="confirm-content">
+                Are you sure?
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="app.closeModal()">Cancel</button>
+                <button class="btn-primary" id="confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifications-container"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>✨ LUCKYVERSE</h3>
+            <p>Virtual Gaming Experience</p>
+            <div class="footer-links">
+                <a onclick="app.navigate('lobby')">Games</a>
+                <a onclick="app.navigate('rewards')">Rewards</a>
+                <a onclick="app.navigate('leaderboard')">Leaderboard</a>
+                <a onclick="app.navigate('history')">History</a>
+                <a onclick="app.navigate('profile')">Settings</a>
+            </div>
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> This website is a fictional demonstration project. All coins are virtual and have no monetary value. No real-money gambling, deposits, or withdrawals are supported.
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
